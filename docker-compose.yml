@@ -1,19 +1,18 @@
 version: '3.8'
 
 services:
-  # api:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - '${PORT}:${PORT}'
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - mysql
-  #   volumes:
-  #     - .:/app
-  # - /app/node_modules
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '${PORT}:${PORT}'
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    volumes:
+      - .:/app
 
   mysql:
     image: mysql:8.0
