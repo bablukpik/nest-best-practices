@@ -3,6 +3,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { TasksRepository } from './tasks.repository';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task } from './task.entity';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -20,21 +21,40 @@ export class TasksService {
     return this.tasksRepository.createTask(createTaskDto);
   }
 
-  async updateTaskStatus(
-    id: string,
-    updateTaskStatusDto: UpdateTaskStatusDto,
-  ): Promise<Task> {
-    const { status } = updateTaskStatusDto;
-
-    // First update the task
-    await this.tasksRepository.update(id, { status });
-
-    // Then fetch and return the updated task
+  async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    const { title, description } = updateTaskDto;
     const task = await this.getTaskById(id);
 
     if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
+
+    if (title) {
+      task.title = title;
+    }
+
+    if (description) {
+      task.description = description;
+    }
+
+    await this.tasksRepository.update(id, task);
+
+    return task;
+  }
+
+  async updateTaskStatus(
+    id: string,
+    updateTaskStatusDto: UpdateTaskStatusDto,
+  ): Promise<Task> {
+    const { status } = updateTaskStatusDto;
+    const task = await this.getTaskById(id);
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+
+    task.status = status;
+    await this.tasksRepository.update(id, task);
 
     return task;
   }

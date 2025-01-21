@@ -10,13 +10,16 @@ export class TasksRepository extends Repository<Task> {
     super(Task, dataSource.createEntityManager());
   }
 
+  // Repository methods create() and save() are used which is the TypeORM recommended pattern
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    const { title, description } = createTaskDto;
+    const { title, description, status } = createTaskDto;
+
     const task = this.create({
       title,
       description,
-      status: TaskStatus.OPEN,
+      status: status || TaskStatus.OPEN, // Use provided status or default to OPEN
     });
+
     await this.save(task);
     return task;
   }
