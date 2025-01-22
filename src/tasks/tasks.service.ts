@@ -9,12 +9,16 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 export class TasksService {
   constructor(private tasksRepository: TasksRepository) {}
 
-  getAllTasks(): Promise<Task[]> {
+  getTasks(): Promise<Task[]> {
     return this.tasksRepository.find();
   }
 
   getTaskById(id: string): Promise<Task> {
-    return this.tasksRepository.findOne({ where: { id } });
+    const task = this.tasksRepository.findOne({ where: { id } });
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+    return task;
   }
 
   createTask(createTaskDto: CreateTaskDto): Promise<Task> {
@@ -24,10 +28,6 @@ export class TasksService {
   async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const { title, description } = updateTaskDto;
     const task = await this.getTaskById(id);
-
-    if (!task) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
-    }
 
     if (title) {
       task.title = title;
@@ -49,12 +49,19 @@ export class TasksService {
     const { status } = updateTaskStatusDto;
     const task = await this.getTaskById(id);
 
-    if (!task) {
-      throw new NotFoundException(`Task with ID ${id} not found`);
-    }
-
     task.status = status;
     await this.tasksRepository.update(id, task);
+
+    return task;
+  }
+
+  async deleteTask(id: string): Promise<Task> {
+    const task = await this.getTaskById(id);
+    const result = await this.tasksRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
 
     return task;
   }
