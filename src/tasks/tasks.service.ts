@@ -4,13 +4,14 @@ import { TasksRepository } from './tasks.repository';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task } from './task.entity';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { FilterTasksDto } from './dto/filter-tasks.dto';
 
 @Injectable()
 export class TasksService {
   constructor(private tasksRepository: TasksRepository) {}
 
-  getTasks(): Promise<Task[]> {
-    return this.tasksRepository.find();
+  async getTasks(filterTasksDto: FilterTasksDto): Promise<Task[]> {
+    return this.tasksRepository.getTasks(filterTasksDto);
   }
 
   getTaskById(id: string): Promise<Task> {
